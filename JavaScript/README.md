@@ -23,3 +23,21 @@ We could include this JavaScript file in our application and use in the followin
     clientInfo.getPlat();
     clientInfo.getCPU();
 ```
+
+# utils.js
+
+### Description
+
+Few utility functions to help work with JavaScript better
+
+### Features
+
+* getDataType - Get the type of a given variable for strict type checking
+
+##### Example
+
+We could include this JavaScript file in our application and use in the following way:
+
+```js
+    Utils.getDataType("123");
+```
