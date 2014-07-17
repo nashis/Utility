@@ -40,14 +40,43 @@ var Utils = (function() {
         }
     };
 
+    _getUserLocationSuccess = function(pos) {
+        var lat = pos.coords.latitude
+                , lng = pos.coords.longitude
+                ;
+
+        _ajaxCall("GET", _config["GOOGLE_GEO_API"], {"latlng": lat + "," + lng, "key": _config["GEO_API_KEY"]}, true, _getUserLocationCallback);
+    };
+
+    _getUserLocationError = function(e) {
+        var retVal = "";
+        switch (e.code) {
+            case e.PERMISSION_DENIED:
+                retVal = "User denied the request for Geolocation.";
+                break;
+            case e.POSITION_UNAVAILABLE:
+                retVal = "Location information is unavailable.";
+                break;
+            case e.TIMEOUT:
+                retVal = "The request to get user location timed out.";
+                break;
+            case e.UNKNOWN_ERROR:
+            default:
+                retVal = "An unknown error occurred.";
+                break;
+        }
+
+        console.log(retVal);
+    };
+
     _getUserLocationCallback = function(data) {
         if (data) {
             data = JSON.parse(data);
             if (data.status === "OK") {
                 var loc = data.results[0].formatted_address.split(",");
                 var locLen = loc.length;
-                var city = loc[locLen-3].trim();
-                var country = loc[locLen-1].trim();
+                var city = loc[locLen - 3].trim();
+                var country = loc[locLen - 1].trim();
                 console.log(city + ", " + country);
             }
         }
@@ -72,20 +101,12 @@ var Utils = (function() {
     };
 
     getUserLocation = function() {
-        var self = this
-                , geoLocation = navigator.geolocation;
+        var geoLocation = navigator.geolocation;
         if (!geoLocation) {
             return false;
         }
 
-        geoLocation.getCurrentPosition(function(pos, self) {
-            var lat = pos.coords.latitude
-                    , lng = pos.coords.longitude
-                    , resp = ""
-                    ;
-
-            _ajaxCall("GET", _config["GOOGLE_GEO_API"], {"latlng": lat + "," + lng, "key": _config["GEO_API_KEY"]}, true, _getUserLocationCallback);
-        });
+        geoLocation.getCurrentPosition(_getUserLocationSuccess, _getUserLocationError);
     };
 
     return {getDataType: getDataType, getUserLocation: getUserLocation};
